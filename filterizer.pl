@@ -1,18 +1,18 @@
 #!/usr/bin/env perl
 
-#
-# Open a krakenuniq report and eliminate rows falling below a kmer threshold
-#
+#? Open a krakenuniq report and eliminate rows falling below a kmer threshold
 
 use strict;
 
+# name of the krakenuniq report file and the kmer threshold to apply (e.g. 2000)
 my($report,$kmers_per_million_reads) = @ARGV;
 
 open (IN,"<$report");
 
 my $header;
+my $h;
 
-my $h = <IN>; $header = $header . $h;
+$h = <IN>; $header = $header . $h;
 $h = <IN>; $header = $header . $h;
 $h = <IN>; $header = $header . $h;
 $h = <IN>; $header = $header . $h;

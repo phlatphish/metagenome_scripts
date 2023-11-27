@@ -8,17 +8,10 @@ use strict;
 use FileHandle;
 use List::Util qw(sum min max);
 
-#
-# What this should do
-#
-# Print read tables for all taxa
-#
-
 
 #
 # Pattern is to select for something like a single genus.
 #
-
 
 
 #
@@ -32,7 +25,7 @@ my ($data_dir,$tax_rank,$infile,$outid,$pattern) = @ARGV;
 #
 if(((scalar @ARGV) < 4) || ((scalar @ARGV) > 5))
 {
-   print "Usage: $0 data_dir_path {S|G} infile outid pattern\n"; 
+   print "Usage: $0 data_dir_path {S|G} infile outid [pattern]\n"; 
    exit -1;
 }
 
@@ -43,7 +36,7 @@ if (! -d $data_dir)
 }
 
 #
-# Directories in which to find data
+# Directories in which to find bracken reports
 #
 my @dir_list = qw(S_CF_B11
                   S_CF_B15
@@ -77,7 +70,7 @@ my @nod_list = qw(CF_B11
                   OP_lobe_2);
 
 #
-# get the number of nodules for later calculations
+# get the number of samples for later calculations
 #
 my $num_samples = scalar @nod_list;
  

@@ -9,7 +9,7 @@ use GD::Graph::hbars;
 use List::Util qw(sum min max);
 
 #
-# What this should do
+# What this does
 #
 # Create bar plot for taxa in a bracken report
 #
@@ -19,7 +19,7 @@ use List::Util qw(sum min max);
 #
 
 #
-# Threshold is the kmers per million reads threshold for eliminating false positives
+# Threshold is the kmers per million reads threshold for eliminating false positives (e.g. 2000)
 #
 
 #
@@ -37,7 +37,7 @@ my $num_taxa = 20;
 #
 if(((scalar @ARGV) < 5) || ((scalar @ARGV) > 6))
 {
-   print "Usage: $0 data_dir_path {S|G} infile outid title {pattern}\n"; 
+   print "Usage: $0 data_dir_path {S|G} infile outid title [pattern]\n"; 
    exit -1;
 }
 
@@ -83,7 +83,7 @@ my @nod_list = qw(CF_B11
 
 
 #
-# get the number of nodules for later calculations
+# get the number of samples for later calculations
 #
 my $num_samples = scalar @nod_list;
  
@@ -225,16 +225,9 @@ sub plot
    {
       @plot_taxa = @ordered_taxa[0 .. ($s_num_taxa - 1)];
    }
-   
-   #print "@plot_taxa\n";
-    
+       
    #
-   #  For select plots, redefine plot taxa and legend taxa here. It's a grotesque hack but its all I can think of
-   #
-
-   #-------------------------------------------------------------------------------------------------------------
-   #
-   #  For select plots, redefine plot taxa and legend taxa here. It's a grotesque hack but its all I can think of
+   #  For select plots, redefine plot taxa and legend taxa here. Might be better to test an arg condition and read a file.
    #
    
    print "Bracken\n";
@@ -457,28 +450,6 @@ sub plot
       push @$all_plot_percents,$nodule_plot_percents;
    } 
 
-
-   # We want 20 taxa
-   # We want 13 nodules
-   # We want 20 arrays, one for each taxon, containing 13 values one for each nodule
-      
-#    #
-#    # Look at the table
-#    # 
-#    $, = "|"; 
-#    
-#    print @nod_list;
-#    print "\n";
-#    
-#    for my $nodule_plot_percents (@$all_plot_percents)
-#    {
-#       print @$nodule_plot_percents;
-#       print "\n";
-#    }
-   
-   
-
-   
                 
    my $graph = new GD::Graph::hbars(1000,1000);
    

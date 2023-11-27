@@ -1,8 +1,6 @@
 #!/usr/bin/env perl
 
-#? Flexibly plot read counts from a set of krakenuniq output
-
-# Divide the responsibilities of collector8.pl into krakenuniq_plotter.pl and krakenuniq_tabulator.pl.
+#? Flexibly plot read counts from a set of krakenuniq outputs
 
 use strict;
 use FileHandle;
@@ -10,7 +8,7 @@ use GD::Graph::hbars;
 use List::Util qw(sum min max);
 
 #
-# What this should do
+# What this does
 #
 # Create bar plot for taxa passing a kmer threshold
 #
@@ -20,14 +18,15 @@ use List::Util qw(sum min max);
 #
 
 #
-# Threshold is the kmers per million reads threshold for eliminating false positives
+# Threshold is the kmers per million reads threshold for eliminating false positives (e.g. 2000)
 #
 
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/krakenuniq_plotter.pl \
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/analysis_090722 \
-# genus \
+# execute like this:
+# krakenuniq_plotter.pl \
+# analysis_dir \
+# G \
 # report \
-# krakenuniq_genus_090622 \
+# krakenuniq_genus_analysis \
 # "Krakenuniq Genus Proportions (Threshold 2000 kmers/million reads)" \
 # 2000 
 
@@ -46,7 +45,7 @@ my $num_taxa = 20;
 #
 if(((scalar @ARGV) < 6) || ((scalar @ARGV) > 7))
 {
-   print "Usage: $0 data_dir_path {S|G} infile outid title {pattern}\n"; 
+   print "Usage: $0 data_dir_path {S|G} infile outid title [pattern]\n"; 
    exit -1;
 }
 
@@ -93,7 +92,7 @@ my @nod_list = qw(CF_B11
 
 
 #
-# get the number of nodules for later calculations
+# get the number of samples for later calculations
 #
 my $num_samples = scalar @nod_list;
  
@@ -195,9 +194,6 @@ DIR: for my $dir ( @dir_list )
       {
          my ($pct,$reads1,$reads2,$kmers,$dup,$cov,$taxid,$rank,$taxon) = split /\t/,$line;
          $taxon =~ s/^\s+//;
-         
-         #print "$pct,$reads1,$reads2,$kmers,$dup,$cov,$taxid,$rank,$taxon\n";
-                
          $read_data->{$dir}->{$taxon} = $reads1;
          $kmer_data->{$dir}->{$taxon} = $kmers;
          $taxon_read_totals{$taxon}   += $reads1;
@@ -249,15 +245,6 @@ sub plot
        $s_num_samples,
        $pattern) = @_;
 
-
-# print "----------------------------\n";
-# print "pattern: $pattern\n";
-# print "s_title: $s_title\n";
-# print "s_threshold: $s_threshold\n";
-# print "tax_rank: $tax_rank\n";
-# print "----------------------------\n";
-# exit 0;
- 
   
    #
    # filter the read and kmer data based on kmers per million reads threshold
@@ -350,7 +337,7 @@ sub plot
     
    #-------------------------------------------------------------------------------------------------------------
    #
-   #  For select plots, redefine plot taxa and legend taxa here. It's a grotesque hack but its all I can think of
+   #  For select plots, redefine plot taxa and legend taxa here. Might be better to test an arg condition and read a file.
    #
    
    print "KrakenUniq\n";
@@ -471,7 +458,7 @@ sub plot
 
                     
 #    #
-#    # Borrowed from google sheets
+#    # Colors borrowed from google sheets
 #    #
 #    my @hues = qw(#4285f4
 #                  #ea4335
@@ -495,7 +482,7 @@ sub plot
 #                  #fdeceb);
 
    #
-   # Borrowed from Paul Tol (https://personal.sron.nl/~pault/) light and muted palettes together
+   # Colors borrowed from Paul Tol (https://personal.sron.nl/~pault/) light and muted palettes together
    #
    my @hues = ('#88CCEE', 
                '#44AA99', 
