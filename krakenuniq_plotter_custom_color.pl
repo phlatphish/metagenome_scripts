@@ -8,29 +8,6 @@ use GD::Graph::hbars;
 use List::Util qw(sum min max);
 
 #
-# What this does
-#
-# Create bar plot for taxa passing a kmer threshold
-#
-
-#
-# Pattern is to select for something like a single genus.
-#
-
-#
-# Threshold is the kmers per million reads threshold for eliminating false positives (e.g. 2000)
-#
-
-# execute like this:
-# krakenuniq_plotter.pl \
-# analysis_dir \
-# G \
-# report \
-# krakenuniq_genus_analysis \
-# "Krakenuniq Genus Proportions (Threshold 2000 kmers/million reads)" \
-# 2000 
-
-#
 # specify these as args
 #
 my ($data_dir,$tax_rank,$infile,$outid,$title,$threshold,$pattern) = @ARGV;
@@ -56,9 +33,10 @@ if (! -d $data_dir)
 }
 
 #
-# Directories in which to find data
-#/home/projects/redgillite/cjb_metagenome/krakenuniq/krakenuniq_plotter.pl \
-
+# CONFIGURE
+#
+# Directories in which to find reports
+#
 my @dir_list = qw(S_CF_B11
                   S_CF_B15
                   S_CF_B16
@@ -72,10 +50,10 @@ my @dir_list = qw(S_CF_B11
                   S_OP_lobe_1
                   S_OP_nod_2
                   S_OP_lobe_2);
-  
+
 #
 # Labels for graph samples
-#               
+#
 my @nod_list = qw(CF_B11
                   CF_B15
                   CF_B16
@@ -332,12 +310,11 @@ sub plot
    {
       @plot_taxa = @ordered_retained_taxa[0 .. ($s_num_taxa - 1)];
    }
-   
-   #print "@plot_taxa\n";
-    
-   #-------------------------------------------------------------------------------------------------------------
+  
    #
-   #  For select plots, redefine plot taxa and legend taxa here. Might be better to test an arg condition and read a file.
+   # CONFIGURE. May comment out
+   #
+   # For select plots, redefine plot taxa and legend taxa here.
    #
    
    print "KrakenUniq\n";
@@ -454,7 +431,7 @@ sub plot
                      
        @label_taxa = @plot_taxa;
    }
-   #-------------------------------------------------------------------------------------------------------------
+   # END CONFIGURE
 
                     
 #    #
@@ -562,24 +539,6 @@ sub plot
    } 
 
 
-   # We want 20 taxa
-   # We want 13 nodules
-   # We want 20 arrays, one for each taxon, containing 13 values one for each nodule
-      
-#    #
-#    # Look at the table
-#    # 
-#    $, = "|"; 
-#    
-#    print @nod_list;
-#    print "\n";
-#    
-#    for my $nodule_plot_percents (@$all_plot_percents)
-#    {
-#       print @$nodule_plot_percents;
-#       print "\n";
-#    }
-                
    my $graph = new GD::Graph::hbars(1000,1000);
    
    
@@ -603,7 +562,7 @@ sub plot
    #
    # non standard location, but nice way to specify
    #
-   my $font = '/home/cjb/miniconda3/envs/gd/fonts/OpenSans-Regular.ttf';
+   my $font = '/path/to/OpenSans-Regular.ttf';
    
    if ( ! -f $font )
    {
@@ -622,9 +581,6 @@ sub plot
    $graph->set(legend_placement => 'BC', legend_marker_width => 15, legend_marker_height => 15);
    $graph->set_legend( @label_taxa );
         
-   #    
-   # Might want to plot with nice nodule names from a map, but this works    
-   #  
    my @data = (\@nod_list,@$all_plot_percents);
       
    my $splotfile_path = $s_data_dir . "/" . $outid . ".png";

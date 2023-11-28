@@ -8,23 +8,6 @@ use GD::Graph::hbars;
 use List::Util qw(sum min max);
 
 #
-# What this does
-#
-# Print read tables for all taxa
-# Print kmer tables for all taxa
-# Apply a kmer threshold filter if specified
-#
-
-
-#
-# Pattern arg is to select for something like a single genus.
-#
-
-#
-# Threshold arg  is the kmers per million reads threshold for eliminating false positives (e.g. 2000)
-#
-
-#
 # specify these as args
 #
 my ($data_dir,$tax_rank,$infile,$outid,$threshold,$pattern) = @ARGV;
@@ -46,6 +29,8 @@ if (! -d $data_dir)
 }
 
 #
+# CONFIGURE
+#
 # Directories in which to find krakenuniq reports
 #
 my @dir_list = qw(S_CF_B11
@@ -61,10 +46,10 @@ my @dir_list = qw(S_CF_B11
                   S_OP_lobe_1
                   S_OP_nod_2
                   S_OP_lobe_2);
-  
+
 #
 # Labels for graph samples
-#               
+#
 my @nod_list = qw(CF_B11
                   CF_B15
                   CF_B16

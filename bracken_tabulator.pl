@@ -8,12 +8,6 @@ use strict;
 use FileHandle;
 use List::Util qw(sum min max);
 
-
-#
-# Pattern is to select for something like a single genus.
-#
-
-
 #
 # specify these as args
 #
@@ -35,6 +29,8 @@ if (! -d $data_dir)
    exit -1;
 }
 
+#
+# CONFIGURE
 #
 # Directories in which to find bracken reports
 #

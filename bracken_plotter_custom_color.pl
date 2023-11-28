@@ -9,20 +9,6 @@ use GD::Graph::hbars;
 use List::Util qw(sum min max);
 
 #
-# What this does
-#
-# Create bar plot for taxa in a bracken report
-#
-
-#
-# Pattern is to select for something like a single genus.
-#
-
-#
-# Threshold is the kmers per million reads threshold for eliminating false positives (e.g. 2000)
-#
-
-#
 # specify these as args
 #
 my ($data_dir,$tax_rank,$infile,$outid,$title,$pattern) = @ARGV;
@@ -47,6 +33,8 @@ if (! -d $data_dir)
    exit -1;
 }
 
+#
+# CONFIGURE
 #
 # Directories in which to find data
 #
@@ -225,9 +213,11 @@ sub plot
    {
       @plot_taxa = @ordered_taxa[0 .. ($s_num_taxa - 1)];
    }
-       
+   
    #
-   #  For select plots, redefine plot taxa and legend taxa here. Might be better to test an arg condition and read a file.
+   # CONFIGURE. May comment out
+   #
+   #  For select plots, redefine plot taxa and legend taxa here.
    #
    
    print "Bracken\n";
@@ -344,9 +334,9 @@ sub plot
                      
        @label_taxa = @plot_taxa;
    }
-   #-------------------------------------------------------------------------------------------------------------
-   
-           
+   # END CONFIGURE
+
+
 #    #
 #    # Borrowed from google sheetss
 #    #
