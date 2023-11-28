@@ -459,16 +459,19 @@ sub plot
 	            cumulate          => 1,
 	            box_axis          => 0,
                );
-               
+    
+   #
+   # CONFIGURE, or comment out and use system fonts
    #
    # non standard location, but nice way to specify
    #
-   my $font = '/home/cjb/miniconda3/envs/gd/fonts/OpenSans-Regular.ttf';
+   my $font = '/path/to/OpenSans-Regular.ttf';
    
    if ( ! -f $font )
    {
       die "Missing font file: $font\n";
    }
+   # END CONFIGURE
     
    $graph->set( dclrs => \@hues ); 
    $graph->set( borderclrs => [undef] );

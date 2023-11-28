@@ -560,6 +560,8 @@ sub plot
                );
                
    #
+   # CONFIGURE, may comment out and use system fonts
+   #
    # non standard location, but nice way to specify
    #
    my $font = '/path/to/OpenSans-Regular.ttf';
@@ -568,7 +570,8 @@ sub plot
    {
       die "Missing font file: $font\n";
    }
-    
+   # END CONFIGURE
+
    $graph->set( dclrs => \@hues ); 
    $graph->set( borderclrs => [undef] );
    $graph->set_title_font($font,18);      
