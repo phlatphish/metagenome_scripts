@@ -33,19 +33,19 @@ if (! -d $data_dir)
 #
 # Directories in which to find krakenuniq reports
 #
-my @dir_list = qw(S_CF_B11
-                  S_CF_B15
-                  S_CF_B16
-                  S_CF_T15
-                  S_CF_T4
-                  S_GC_1
-                  S_GC_2
-                  S_OP_3
-                  S_OP_4
-                  S_OP_nod_1
-                  S_OP_lobe_1
-                  S_OP_nod_2
-                  S_OP_lobe_2);
+#my @dir_list = qw(S_CF_B11
+#                  S_CF_B15
+#                  S_CF_B16
+#                  S_CF_T15
+#                  S_CF_T4
+#                  S_GC_1
+#                  S_GC_2
+#                  S_OP_3
+#                  S_OP_4
+#                  S_OP_nod_1
+#                  S_OP_lobe_1
+#                  S_OP_nod_2
+#                  S_OP_lobe_2);
 
 #
 # Labels for graph samples
@@ -63,6 +63,8 @@ my @nod_list = qw(CF_B11
                   OP_lobe_1
                   OP_nod_2
                   OP_lobe_2);
+
+my @dir_list = @nod_list;
 
 #
 # get the number of samples for later calculations

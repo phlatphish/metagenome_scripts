@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-#? Flexibly plot read counts from a set of krakenuniq outputs
+#? Flexibly plot read counts from a set of bracken reports
 
 use strict;
 use FileHandle;
@@ -10,16 +10,18 @@ use List::Util qw(sum min max);
 #
 # specify these as args
 #
-my ($data_dir,$tax_rank,$infile,$outid,$title,$threshold,$pattern,$hack) = @ARGV;
+my ($data_dir,$tax_rank,$infile,$outid,$title,$pattern,$hack) = @ARGV;
+
+# kmer threshold is not needed as data have been processed by kraken already
+# kmer counts are not specified in the bracken reports
 
 # print "----------------------------\n";
 # print "data_dir: $data_dir\n";
 # print "hack: $hack\n";
 # print "infile: $infile\n";
 # print "outid: $outid\n";
-# print "pattern: $pattern\n";
 # print "tax_rank: $tax_rank\n";
-# print "threshold: $threshold\n";
+# print "pattern: $pattern\n";
 # print "title: $title\n";
 # print "----------------------------\n";
 # exit 0;
@@ -32,32 +34,10 @@ my ($data_dir,$tax_rank,$infile,$outid,$title,$threshold,$pattern,$hack) = @ARGV
 # infile:    name of the report file, usually "report"
 # outid:     string to use to name the output of this script e.g. krakenuniq_genus_0
 # title:     Title of the plotted graph, e.g. "Krakenuniq Genus Proportions (No kmer threshold)"
-# threshold  kmer threshold per million reads. usually 0 or 2000
 # pattern    Pattern to filter, like "Frankia", or 0 for no filter
 # hack       0 or 1, to force taxon naming using a list
 
-# examples:
-#
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/metagenome_scripts/krakenuniq_plotter_hack.pl \
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/analysis_080124 \
-# genus \
-# report \
-# krakenuniq_genus_0 \
-# "Krakenuniq Genus Proportions (No kmer threshold)" \
-# 0 \
-# 0 \
-# 0
 
-#
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/metagenome_scripts/krakenuniq_plotter_hack.pl \
-# /home/projects/redgillite/cjb_metagenome/krakenuniq/analysis_080124 \
-# genus \
-# report \
-# krakenuniq_genus_0 \
-# "Krakenuniq Genus Proportions (No kmer threshold)" \
-# 0 \
-# 0 \
-# 1
 
 #
 # hack and pattern cannot both be true
@@ -77,9 +57,9 @@ my $num_taxa = 20;
 #
 # some input checking
 #
-if( scalar @ARGV != 8 )
+if( scalar @ARGV != 7 )
 {
-   print "Usage: $0 data_dir_path {S|G} infile outid title threshold pattern hack\n"; 
+   print "Usage: $0 data_dir_path {S|G} infile outid title pattern hack\n"; 
    exit -1;
 }
 
@@ -231,18 +211,6 @@ my $read_data;
 
 
 #
-# main data structure: kmer_data->dir->taxon_name = kmers
-#
-my $kmer_data;
-
-
-#
-# totals of kmers ACROSS nodules for each taxon: taxon_read_totals{taxon} = kmers
-#
-my %taxon_kmer_totals;
-
-
-#
 # totals of reads ACROSS nodules for each taxon: taxon_read_totals{taxon} = reads
 #
 my %taxon_read_totals;
@@ -255,16 +223,9 @@ my %sample_read_totals;
 
 
 #
-#  totals of kmers for each nodule: sample_read_totals{sample} = kmers;
-#
-my %sample_kmer_totals;
-
-
-#
 # classified reads and kmers for each sample
 #
 my %classified_reads;  # classified_reads{sample} = reads
-my %classified_kmers;  # classified_kmers{sample} = kmers
 
 
 #
@@ -278,34 +239,32 @@ DIR: for my $dir ( @dir_list )
       
    #print "$dir\n";
 
+   # get each line from report  
    LINE: while(my $line = <IN>)
    {
       chomp $line;
-      
-      # common to the whole sample      
+            
       if($line =~ /root/)
       {
-         my ($pct,$reads1,$reads2,$kmers,$dup,$cov,$taxid,$rank,$taxon) = split /\t/,$line;
+         my ($pct,$reads1,$reads2,$rank,$taxid,$taxon) = split /\t/,$line;      
          $classified_reads{$dir} = $reads1;
-         $classified_kmers{$dir} = $kmers;
       }
       
       # consider only lines with chosen taxonomic rank
       if($line =~ /\d\t$tax_rank\t/)
       {
-         my ($pct,$reads1,$reads2,$kmers,$dup,$cov,$taxid,$rank,$taxon) = split /\t/,$line;
+         my ($pct,$reads1,$reads2,$rank,$taxid,$taxon) = split /\t/,$line;      
          $taxon =~ s/^\s+//;
+                         
          $read_data->{$dir}->{$taxon} = $reads1;
-         $kmer_data->{$dir}->{$taxon} = $kmers;
          $taxon_read_totals{$taxon}   += $reads1;
-         $taxon_kmer_totals{$taxon}   += $kmers;
          $sample_read_totals{$dir}    += $reads1;
-         $sample_kmer_totals{$dir}    += $kmers;
 
       }
    }
    close(IN);
 }
+
 
 
 
@@ -317,15 +276,11 @@ plot  ($data_dir,
        \@dir_list,
        \@nod_list,
        $read_data,
-       $kmer_data,
        \%classified_reads,
-       \%classified_kmers,
        $num_taxa,
        $outid,
        $title,
        \%taxon_read_totals,
-       \%taxon_kmer_totals,
-       $threshold,
        $num_samples,
        $pattern,
        $hack,
@@ -351,77 +306,26 @@ sub plot
        $s_dir_list,
        $s_nod_list,
        $s_read_data,
-       $s_kmer_data,
        $s_classified_reads,
-       $s_classified_kmers,
        $s_num_taxa,
        $s_outid,
        $s_title,
        $s_taxon_read_totals,
-       $s_taxon_kmer_totals,
-       $s_threshold,
        $s_num_samples,
        $s_pattern,
        $s_hack,
        $s_plot_hack_taxa,
        $s_label_hack_taxa) = @_;
   
-   # list taxa retained after filtering out the false positives
-   my @retained_taxa;
-   
    # taxa for plotting and labeling
    my @s_plot_taxa = ();
-   my @s_label_taxa = ();
-   
-   # Apply kmer threshold per million reads
-   while( my ($dir,$dir_data) = each %$s_read_data)
-   {
-      # get millions of classified reads * kmer threshold. That is the bar each taxon needs to clear. It can be zero.
-      my $test_kmers = int ($s_classified_reads->{$dir}/1000000)*$s_threshold;
-   
-      # for each taxon
-      while( my ($taxon,$reads) = each %$dir_data)
-      {
-         # get number of kmers
-         #print "$dir\t$taxon\t$s_kmer_data->{$dir}->{$taxon}\n";
- 
-         # pass test, add to retained taxa
-         if($s_kmer_data->{$dir}->{$taxon} > $test_kmers)
-         {
-            push @retained_taxa,$taxon;
-            #print "$dir,$taxon,$s_kmer_data->{$dir}->{$taxon},[$test_kmers]\n";
-         }
-         # fails test, set values to zero
-         else
-         {
-            $s_read_data->{$dir}->{$taxon} = 0;
-            $s_kmer_data->{$dir}->{$taxon} = 0;
-         }
-      }       
-   }
-   
+   my @s_label_taxa = ();   
     
    #
    # reverse order taxa by read totals across samples
    #   
    my @ordered_taxa = (sort { $s_taxon_read_totals->{$b} <=> $s_taxon_read_totals->{$a} } keys %$s_taxon_read_totals);
-   
-   #
-   # taxa retained after filtering falsies, in reverse order by read totals
-   #
-   my @ordered_retained_taxa;
-   
-   #
-   # get out the filtered/retained taxa in the same order
-   #
-   for my $ordered_taxon (@ordered_taxa)
-   {
-      if(grep /$ordered_taxon/,@retained_taxa)
-      {
-          push @ordered_retained_taxa,$ordered_taxon;
-      }
-   }
-        
+           
    #
    # If a pattern is suggested, select for it or take the top N
    #  
@@ -429,16 +333,12 @@ sub plot
 
    if($s_pattern ne 0)
    {
-      #print STDERR"$s_pattern must not be 0\n";
-      
-      @s_plot_taxa = grep(/$pattern/, @ordered_retained_taxa);
+      @s_plot_taxa = grep(/$pattern/, @ordered_taxa);
       @s_plot_taxa = @s_plot_taxa[0 .. ($s_num_taxa - 1)];
    }
    else
    {
-      @s_plot_taxa = @ordered_retained_taxa[0 .. ($s_num_taxa - 1)];
-      
-      #print STDERR "$s_pattern must be 0\n";
+      @s_plot_taxa = @ordered_taxa[0 .. ($s_num_taxa - 1)];
    }
   
    @s_label_taxa = @s_plot_taxa;
